@@ -24,6 +24,8 @@ def _get_pdb(pdb_list, file_path, report, csv_path):
     report_info = [] 
     column_names = ['name', 'type', 'cath_id', 'res_count']
     pdbl.download_pdb_files(pdb_list, file_format='pdb', pdir=file_path)
+    '''
+    commenting out for now awaiting clarification on how to gather this data
     if report:
         for protein in pdb_list:
             print(protein)
@@ -33,6 +35,7 @@ def _get_pdb(pdb_list, file_path, report, csv_path):
             for residue in residues:
                 count += 1
             print(count)
+    '''
 
 def main():
     protein_ID = sys.argv[1]
