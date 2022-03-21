@@ -1,6 +1,8 @@
 import sys
 import requests
+import pandas as pd
 from Bio.PDB.PDBList import PDBList
+from Bio.PDB.PDBParser import PDBParser 
 
 def _request_family(family_id):
     """
@@ -16,19 +18,39 @@ def _request_family(family_id):
         pdb_codes.append(data['data'][i]['domain_id'][:4])
     return list(set(pdb_codes))
 
+def _get_pdb(pdb_list, file_path, report, csv_path):
+    pdbl = PDBList()
+    report_info = [] 
+    column_names = ['name', 'type', 'cath_id', 'res_count']
+    for protein in pdb_list:
+        pdbl.retrieve_pdb_file(protein, file_format='pdb', pdir=file_path)
+        if report:
+            return
+            
+        
+
 def main():
-    # determine type of protien_name given family_id or pdb_code
-    # based on determination run code 
-    # if flag given generate report
-    pdb_set = _request_family(sys.argv[1])
-    if len(pdb_set) == 0:
-        print("got nothing back from cath_id")
-    print(len(pdb_set))
-    print(pdb_set)
-    # pdbl = PDBList()
-    # pdbl.retrieve_pdb_file(sys.argv[1], file_format='pdb', pdir=sys.argv[2])
+    protein_ID = sys.argv[1]
+    dest_path = sys.argv[2]
+    generate_report = False
+    csv_path = ''
+    if '-r' in sys.argv:
+        generate_report = True 
+        csv_path = sys.argv[sys.argv.index('-r') + 1]
+    if '.' in: protein_ID:
+        pdb_set = _request_family(protein_ID)
+        if len(pdb_set) == 0:
+            print("got nothing back from cath_id")
+            return
+        _get_pdb(pdb_set, dest_path, generate_report, csv_path)
 
 if __name__ ==  '__main__':
     if len(sys.argv) < 3:
         print('Usage: python3 protdb.py protien_name destination_path')
-    main()
+    #main()
+    pdbl = PDBList()
+    pdbp = PDBParser()
+    pdbl.retrieve_pdb_file(sys.argv[1], file_format='pdb', pdir=sys.argv[2])
+    #pdbp.get
+
+
