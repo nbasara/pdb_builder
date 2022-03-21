@@ -20,14 +20,19 @@ def _request_family(family_id):
 
 def _get_pdb(pdb_list, file_path, report, csv_path):
     pdbl = PDBList()
+    p =  PDBParser()
     report_info = [] 
     column_names = ['name', 'type', 'cath_id', 'res_count']
-    for protein in pdb_list:
-        pdbl.retrieve_pdb_file(protein, file_format='pdb', pdir=file_path)
-        if report:
-            return
-            
-        
+    pdbl.download_pdb_files(pdb_list, file_format='pdb', pdir=file_path)
+    if report:
+        for protein in pdb_list:
+            print(protein)
+            structure = p.get_structure(protein,  file_path + 'pdb' + protein.lower() + '.ent')
+            residues = structure.get_residues()
+            count = 0 
+            for residue in residues:
+                count += 1
+            print(count)
 
 def main():
     protein_ID = sys.argv[1]
@@ -37,20 +42,17 @@ def main():
     if '-r' in sys.argv:
         generate_report = True 
         csv_path = sys.argv[sys.argv.index('-r') + 1]
-    if '.' in: protein_ID:
+    if '.' in protein_ID:
         pdb_set = _request_family(protein_ID)
         if len(pdb_set) == 0:
             print("got nothing back from cath_id")
             return
         _get_pdb(pdb_set, dest_path, generate_report, csv_path)
+    else:
+        _get_pdb([protein_ID], dest_path, generate_report, csv_path)
+
 
 if __name__ ==  '__main__':
     if len(sys.argv) < 3:
         print('Usage: python3 protdb.py protien_name destination_path')
-    #main()
-    pdbl = PDBList()
-    pdbp = PDBParser()
-    pdbl.retrieve_pdb_file(sys.argv[1], file_format='pdb', pdir=sys.argv[2])
-    #pdbp.get
-
-
+    main()
