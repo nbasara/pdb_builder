@@ -1,8 +1,6 @@
 import sys
 import requests
-import pandas as pd
 from Bio.PDB.PDBList import PDBList
-from Bio.PDB.PDBParser import PDBParser 
 
 def _request_family(family_id):
     """
@@ -18,11 +16,17 @@ def _request_family(family_id):
         pdb_codes.append(data['data'][i]['domain_id'][:4])
     return list(set(pdb_codes))
 
-def _get_pdb(pdb_list, file_path, report, csv_path):
+def _get_file_IDs(file_path):
+    """
+    Given a file path open that file and read IDs and return as a list
+    """
+    with open(file_path, 'r') as fd:
+        content = fd.read()
+        protein_IDs = content.split()
+        return protein_IDs
+
+def _get_pdb(pdb_list, file_path):
     pdbl = PDBList()
-    p =  PDBParser()
-    report_info = [] 
-    column_names = ['name', 'type', 'cath_id', 'res_count']
     pdbl.download_pdb_files(pdb_list, file_format='pdb', pdir=file_path)
     '''
     commenting out for now awaiting clarification on how to gather this data
@@ -38,21 +42,25 @@ def _get_pdb(pdb_list, file_path, report, csv_path):
     '''
 
 def main():
+    """
+    Download pdb files from source 
+    """
     protein_ID = sys.argv[1]
     dest_path = sys.argv[2]
-    generate_report = False
-    csv_path = ''
-    if '-r' in sys.argv:
-        generate_report = True 
-        csv_path = sys.argv[sys.argv.index('-r') + 1]
+    # getting IDs from a file
+    if '-f' in sys.argv:
+        pdb_set  =  _get_file_IDs(protein_ID)
+        _get_pdb(pdb_set, dest_path)
+        return
+
     if '.' in protein_ID:
         pdb_set = _request_family(protein_ID)
         if len(pdb_set) == 0:
             print("got nothing back from cath_id")
             return
-        _get_pdb(pdb_set, dest_path, generate_report, csv_path)
+        _get_pdb(pdb_set, dest_path)
     else:
-        _get_pdb([protein_ID], dest_path, generate_report, csv_path)
+        _get_pdb([protein_ID], dest_path)
 
 
 if __name__ ==  '__main__':
